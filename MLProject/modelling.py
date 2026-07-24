@@ -15,13 +15,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
-EXPERIMENT_NAME = "sentiment-analysis-playstore-ci"
-
-
 def main(data_path: str):
-    mlflow.set_tracking_uri("file:./mlruns")
-    mlflow.set_experiment(EXPERIMENT_NAME)
-
+    # Tracking URI, experiment, dan run sudah disiapkan oleh `mlflow run` (MLflow
+    # Projects) lewat env var MLFLOW_TRACKING_URI / MLFLOW_RUN_ID / MLFLOW_EXPERIMENT_ID.
+    # Jangan panggil mlflow.set_experiment()/mlflow.start_run(run_name=...) di sini,
+    # karena itu akan bentrok dengan run yang sudah dibuat oleh `mlflow run` (error:
+    # "active run ID does not match environment run ID").
     df = pd.read_csv(data_path)
     X_train, X_test, y_train, y_test = train_test_split(
         df["text"], df["sentiment"], test_size=0.2, random_state=42, stratify=df["sentiment"]
@@ -29,15 +28,14 @@ def main(data_path: str):
 
     mlflow.sklearn.autolog()
 
-    with mlflow.start_run(run_name="ci-retrain-svm-tfidf"):
-        pipeline = Pipeline([
-            ("tfidf", TfidfVectorizer(max_features=5000)),
-            ("svm", SVC(kernel="linear", random_state=42)),
-        ])
-        pipeline.fit(X_train, y_train)
+    pipeline = Pipeline([
+        ("tfidf", TfidfVectorizer(max_features=5000)),
+        ("svm", SVC(kernel="linear", random_state=42)),
+    ])
+    pipeline.fit(X_train, y_train)
 
-        test_acc = pipeline.score(X_test, y_test)
-        print(f"Test accuracy: {test_acc:.4f}")
+    test_acc = pipeline.score(X_test, y_test)
+    print(f"Test accuracy: {test_acc:.4f}")
 
 
 if __name__ == "__main__":

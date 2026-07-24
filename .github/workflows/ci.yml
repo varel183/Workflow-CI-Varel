@@ -26,7 +26,7 @@ jobs:
 
       - name: Run MLflow Project (retrain model)
         working-directory: MLProject
-        run: mlflow run . --env-manager=local
+        run: mlflow run . --env-manager=local --experiment-name sentiment-analysis-playstore-ci
 
       - name: Upload MLflow tracking artifacts
         uses: actions/upload-artifact@v4
