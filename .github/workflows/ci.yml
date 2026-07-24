@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12.7"
 
       - name: Install dependencies
-        run: pip install mlflow==2.19.0 pandas==2.2.3 scikit-learn==1.8.0 matplotlib==3.10.0
+        run: pip install mlflow==2.19.0 pandas==2.2.3 scikit-learn==1.5.2 matplotlib==3.10.0
 
       - name: Run MLflow Project (retrain model)
         working-directory: MLProject
