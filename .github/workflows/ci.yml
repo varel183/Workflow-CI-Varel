@@ -1,0 +1,36 @@
+name: MLflow CI - Retrain Model
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "MLProject/**"
+      - ".github/workflows/ci.yml"
+  workflow_dispatch: {}
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.7"
+
+      - name: Install dependencies
+        run: pip install mlflow==2.19.0 pandas==2.2.3 scikit-learn==1.8.0 matplotlib==3.10.0
+
+      - name: Run MLflow Project (retrain model)
+        working-directory: MLProject
+        run: mlflow run . --env-manager=local
+
+      - name: Upload MLflow tracking artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlruns-${{ github.run_number }}
+          path: MLProject/mlruns/
+          retention-days: 30
